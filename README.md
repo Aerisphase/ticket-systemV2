@@ -1,203 +1,82 @@
-2. Настройка PostgreSQL
-Запустите pgAdmin (устанавливается с PostgreSQL)
 
-Создайте базу данных:
+# Система бронирования билетов (Java + PostgreSQL)
 
+## Содержание
+1. [Технологический стек](#технологический-стек)
+2. [Установка и настройка](#установка-и-настройка)
+3. [Запуск приложения](#запуск-приложения)
+4. [Настройка PostgreSQL](#настройка-postgresql)
+5. [Дополнительные настройки](#дополнительные-настройки)
+
+---
+
+## Технологический стек
+- **Backend**: Java 17+, Spring Boot 3.1+, Hibernate 6.0+
+- **Frontend**: Java Swing
+- **База данных**: PostgreSQL 14+
+- **Билд-система**: Maven 3.8+
+
+---
+
+## Установка и настройка
+
+### Предварительные требования
+- Установите [Java 17+](https://adoptium.net/)
+- Установите [PostgreSQL 14+](https://www.postgresql.org/download/)
+- Установите [Maven 3.8+](https://maven.apache.org/)
+
+---
+
+## Запуск приложения
+
+### Серверная часть
+```bash
+cd ticket-server
+mvn spring-boot:run
+Клиентская часть
+bash
+Copy
+cd ticket-client
+mvn exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
+Настройка PostgreSQL
+1. Создание БД и пользователя
 sql
 Copy
 CREATE DATABASE ticketdb;
 CREATE USER ticketuser WITH PASSWORD 'ticketpass';
 GRANT ALL PRIVILEGES ON DATABASE ticketdb TO ticketuser;
-3. Настройка серверной части в VS Code
-Откройте папку ticket-server в VS Code
-
-Измените src/main/resources/application.properties:
+2. Настройка подключения
+В ticket-server/src/main/resources/application.properties:
 
 properties
 Copy
 spring.datasource.url=jdbc:postgresql://localhost:5432/ticketdb
 spring.datasource.username=ticketuser
 spring.datasource.password=ticketpass
-Запустите сервер:
-
-Откройте класс TicketServerApplication.java
-
-Нажмите F5 или используйте меню "Run -> Start Debugging"
-
-Или через терминал:
-
-powershell
-Copy
-mvnw.cmd spring-boot:run
-4. Настройка клиентской части
-Откройте папку ticket-client в новом окне VS Code
-
-Убедитесь, что файл pom.xml содержит все зависимости
-
-Запустите клиент:
-
-Откройте класс TicketClientApp.java
-
-Нажмите F5 (предварительно создав конфигурацию запуска)
-
-Или через терминал:
-
-powershell
-Copy
-mvnw.cmd exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
-5. Альтернативный запуск (с package)
-Соберите сервер:
-
-powershell
-Copy
-cd ticket-server
-mvnw.cmd clean package
-java -jar target/ticket-server-0.0.1-SNAPSHOT.jar
-Соберите клиент:
-
-powershell
-Copy
-cd ticket-client
-mvnw.cmd clean package
-java -cp target/classes com.ticketclient.TicketClientApp
-
-
-______________________________________________________
-Postgres подробнее
-
-1. Установка PostgreSQL
-Скачайте установщик с официального сайта
-
-Запустите установщик и следуйте шагам:
-
-Укажите директорию установки (по умолчанию C:\Program Files\PostgreSQL\<версия>)
-
-На шаге "Select Components" оставьте все компоненты отмеченными
-
-Укажите директорию данных (по умолчанию C:\Program Files\PostgreSQL\<версия>\data)
-
-Задайте пароль для суперпользователя postgres (запомните его!)
-
-Порт оставьте по умолчанию (5432)
-
-Локаль можно оставить "Default locale"
-
-2. Настройка сервера
-После установки найдите "pgAdmin 4" в меню Пуск и запустите
-
-При первом запуске задайте мастер-пароль для pgAdmin
-
-В левом меню:
-
-Разверните "Servers" → "PostgreSQL <версия>"
-
-Введите пароль, заданный при установке
-
-3. Создание базы данных и пользователя
-В pgAdmin:
-
-Правой кнопкой на "Databases" → "Create" → "Database"
-
-Введите имя: ticketdb
-
-Владельца оставьте postgres → "Save"
-
-Создайте пользователя:
-
-Правой кнопкой на "Login/Group Roles" → "Create" → "Login/Group Role"
-
-Во вкладке "General":
-
-Имя: ticketuser
-
-Во вкладке "Definition":
-
-Пароль: ticketpass
-
-Повторите пароль
-
-Во вкладке "Privileges":
-
-Включите "Can login?" и "Superuser?"
-
-Нажмите "Save"
-
-4. Настройка прав доступа
-Найдите файл pg_hba.conf (обычно в C:\Program Files\PostgreSQL\<версия>\data)
-
-Добавьте в конец файла:
+spring.jpa.hibernate.ddl-auto=update
+3. Настройка прав доступа
+В файле pg_hba.conf добавьте:
 
 Copy
-# TYPE  DATABASE        USER            ADDRESS                 METHOD
 host    ticketdb        ticketuser      127.0.0.1/32            md5
 host    ticketdb        ticketuser      ::1/128                 md5
-Найдите файл postgresql.conf в той же папке
+Дополнительные настройки
+Удаленный доступ
+В postgresql.conf:
 
-Убедитесь, что строка содержит:
-
+ini
 Copy
 listen_addresses = '*'
-5. Перезапуск сервера
-Через панель управления:
-
-Откройте "Службы" (Win+R → services.msc)
-
-Найдите "postgresql-x64-<версия>"
-
-Правой кнопкой → "Перезапустить"
-
-6. Проверка подключения
-В pgAdmin создайте новое подключение:
-
-Host: localhost
-
-Port: 5432
-
-Maintenance database: postgres
-
-Username: ticketuser
-
-Password: ticketpass
-
-Или через командную строку:
-
-powershell
-Copy
-psql -U ticketuser -d ticketdb -h localhost
-(введите пароль ticketpass)
-
-7. Настройка для Spring Boot
-В application.properties укажите:
-
-properties
-Copy
-spring.datasource.url=jdbc:postgresql://localhost:5432/ticketdb
-spring.datasource.username=ticketuser
-spring.datasource.password=ticketpass
-spring.datasource.driver-class-name=org.postgresql.Driver
-
-# Для автоматического создания таблиц
-spring.jpa.hibernate.ddl-auto=update
-8. Дополнительные настройки (опционально)
-Для удаленного доступа:
-
-В брандмауэре разрешите входящие подключения на порт 5432
-
-В postgresql.conf укажите:
-
-Copy
-listen_addresses = '*'
-В pg_hba.conf добавьте:
+В pg_hba.conf:
 
 Copy
 host    all             all             0.0.0.0/0               md5
-Для резервного копирования:
-
-powershell
+Резервное копирование
+bash
 Copy
 pg_dump -U ticketuser -d ticketdb -f backup.sql
-Для восстановления:
-
-powershell
+Восстановление
+bash
 Copy
 psql -U ticketuser -d ticketdb -f backup.sql
+Примечание: Для работы с pgAdmin используйте мастер-пароль, заданный при установке PostgreSQL.
