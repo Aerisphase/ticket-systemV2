@@ -93,93 +93,55 @@ PUT /api/tickets/{id}/pay - оплатить билет
 📜 Лицензия
 MIT License. Подробнее см. в файле LICENSE.
 
-### 📌 Инструкция по запуску проекта "Система бронирования билетов"
+🗃 Настройка базы данных
+Установите PostgreSQL
 
-#### 1. Подготовка среды
-**Необходимые компоненты:**
-- [Java JDK 17+](https://adoptium.net/temurin/releases/)
-- [PostgreSQL 14+](https://www.postgresql.org/download/)
-- [Maven 3.8+](https://maven.apache.org/download.cgi)
-- [Git](https://git-scm.com/downloads)
+Создайте БД и пользователя:
 
-#### 2. Установка PostgreSQL
-1. Запустите установщик PostgreSQL
-2. Запомните пароль для пользователя `postgres`
-3. После установки откройте **pgAdmin**
-4. Создайте новую базу данных:
-   ```sql
-   CREATE DATABASE ticketdb;
-   CREATE USER ticketuser WITH PASSWORD 'ticketpass';
-   GRANT ALL PRIVILEGES ON DATABASE ticketdb TO ticketuser;
-   ```
+sql
+Copy
+CREATE DATABASE ticketdb;
+CREATE USER ticketuser WITH PASSWORD 'ticketpass';
+GRANT ALL PRIVILEGES ON DATABASE ticketdb TO ticketuser;
+Настройте подключение в ticket-server/src/main/resources/application.properties:
 
-#### 3. Настройка серверной части
-1. Клонируйте репозиторий:
-   ```bash
-   git clone https://github.com/your-repo/ticket-reservation-system.git
-   cd ticket-reservation-system
-   ```
-
-2. Настройте подключение к БД (файл `ticket-server/src/main/resources/application.properties`):
-   ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/ticketdb
-   spring.datasource.username=ticketuser
-   spring.datasource.password=ticketpass
-   ```
-
-3. Запустите сервер:
-   ```bash
-   cd ticket-server
-   mvn spring-boot:run
-   ```
-   Сервер будет доступен по адресу: `http://localhost:8080`
-
-#### 4. Запуск клиентского приложения
-1. В новом терминале:
-   ```bash
-   cd ticket-client
-   mvn exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
-   ```
-
-2. Или через IDE:
-   - Откройте класс `TicketClientApp.java`
-   - Нажмите "Run"
-
-#### 5. Проверка работы
-1. В клиентском приложении:
-   - Должен отобразиться список мероприятий
-   - Можно забронировать билет, нажав кнопку "Забронировать"
-
-2. Для проверки API:
-   ```bash
-   curl http://localhost:8080/api/events
-   ```
-
-#### Альтернативный запуск (сборка JAR)
-**Сервер:**
-```bash
+properties
+Copy
+spring.datasource.url=jdbc:postgresql://localhost:5432/ticketdb
+spring.datasource.username=ticketuser
+spring.datasource.password=ticketpass
+🚀 Запуск сервера
+bash
+Copy
 cd ticket-server
-mvn clean package
-java -jar target/ticket-server-0.0.1-SNAPSHOT.jar
-```
+mvn spring-boot:run
+Сервер будет доступен на http://localhost:5432
 
-**Клиент:**
-```bash
+💻 Запуск клиента
+bash
+Copy
 cd ticket-client
-mvn clean package
-java -cp target/classes com.ticketclient.TicketClientApp
-```
+mvn exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
+✔️ Проверка работы
+В клиентском приложении должен появиться список мероприятий
 
-#### 🔍 Устранение неполадок
-1. Если PostgreSQL не подключается:
-   - Проверьте, что служба PostgreSQL запущена
-   - Убедитесь, что в `pg_hba.conf` есть строка:
-     ```
-     host    ticketdb        ticketuser      127.0.0.1/32            md5
-     ```
+Для проверки API выполните:
 
-2. Если клиент не видит сервер:
-   - Проверьте, что сервер запущен (`http://localhost:8080/actuator/health`)
-   - Убедитесь, что брандмауэр не блокирует порт 8080
+bash
+Copy
+curl http://localhost:5432/api/events
+🔧 Устранение неполадок
+Ошибки подключения к PostgreSQL
+Проверьте статус службы PostgreSQL
 
-> **Примечание:** Для первого запуска может потребоваться несколько минут на загрузку зависимостей Maven.
+Убедитесь что в pg_hba.conf есть:
+
+Copy
+host    ticketdb        ticketuser      127.0.0.1/32            md5
+Клиент не подключается к серверу
+Проверьте что сервер запущен:
+
+bash
+Copy
+curl http://localhost:5432/actuator/health
+Убедитесь что порт 5432 не заблокирован брандмауэром
