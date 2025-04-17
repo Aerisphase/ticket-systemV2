@@ -1,4 +1,4 @@
-2. Настройка PostgreSQL
+1. Настройка PostgreSQL
 Запустите pgAdmin (устанавливается с PostgreSQL)
 
 Создайте базу данных:
@@ -8,7 +8,7 @@ Copy
 CREATE DATABASE ticketdb;
 CREATE USER ticketuser WITH PASSWORD 'ticketpass';
 GRANT ALL PRIVILEGES ON DATABASE ticketdb TO ticketuser;
-3. Настройка серверной части в VS Code
+2. Настройка серверной части в VS Code
 Откройте папку ticket-server в VS Code
 
 Измените src/main/resources/application.properties:
@@ -29,7 +29,7 @@ spring.datasource.password=ticketpass
 powershell
 Copy
 mvnw.cmd spring-boot:run
-4. Настройка клиентской части
+3. Настройка клиентской части
 Откройте папку ticket-client в новом окне VS Code
 
 Убедитесь, что файл pom.xml содержит все зависимости
@@ -45,7 +45,7 @@ mvnw.cmd spring-boot:run
 powershell
 Copy
 mvnw.cmd exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
-5. Альтернативный запуск (с package)
+4. Альтернативный запуск (с package)
 Соберите сервер:
 
 powershell
