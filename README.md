@@ -92,3 +92,94 @@ PUT /api/tickets/{id}/pay - оплатить билет
 
 📜 Лицензия
 MIT License. Подробнее см. в файле LICENSE.
+
+### 📌 Инструкция по запуску проекта "Система бронирования билетов"
+
+#### 1. Подготовка среды
+**Необходимые компоненты:**
+- [Java JDK 17+](https://adoptium.net/temurin/releases/)
+- [PostgreSQL 14+](https://www.postgresql.org/download/)
+- [Maven 3.8+](https://maven.apache.org/download.cgi)
+- [Git](https://git-scm.com/downloads)
+
+#### 2. Установка PostgreSQL
+1. Запустите установщик PostgreSQL
+2. Запомните пароль для пользователя `postgres`
+3. После установки откройте **pgAdmin**
+4. Создайте новую базу данных:
+   ```sql
+   CREATE DATABASE ticketdb;
+   CREATE USER ticketuser WITH PASSWORD 'ticketpass';
+   GRANT ALL PRIVILEGES ON DATABASE ticketdb TO ticketuser;
+   ```
+
+#### 3. Настройка серверной части
+1. Клонируйте репозиторий:
+   ```bash
+   git clone https://github.com/your-repo/ticket-reservation-system.git
+   cd ticket-reservation-system
+   ```
+
+2. Настройте подключение к БД (файл `ticket-server/src/main/resources/application.properties`):
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/ticketdb
+   spring.datasource.username=ticketuser
+   spring.datasource.password=ticketpass
+   ```
+
+3. Запустите сервер:
+   ```bash
+   cd ticket-server
+   mvn spring-boot:run
+   ```
+   Сервер будет доступен по адресу: `http://localhost:8080`
+
+#### 4. Запуск клиентского приложения
+1. В новом терминале:
+   ```bash
+   cd ticket-client
+   mvn exec:java -Dexec.mainClass="com.ticketclient.TicketClientApp"
+   ```
+
+2. Или через IDE:
+   - Откройте класс `TicketClientApp.java`
+   - Нажмите "Run"
+
+#### 5. Проверка работы
+1. В клиентском приложении:
+   - Должен отобразиться список мероприятий
+   - Можно забронировать билет, нажав кнопку "Забронировать"
+
+2. Для проверки API:
+   ```bash
+   curl http://localhost:8080/api/events
+   ```
+
+#### Альтернативный запуск (сборка JAR)
+**Сервер:**
+```bash
+cd ticket-server
+mvn clean package
+java -jar target/ticket-server-0.0.1-SNAPSHOT.jar
+```
+
+**Клиент:**
+```bash
+cd ticket-client
+mvn clean package
+java -cp target/classes com.ticketclient.TicketClientApp
+```
+
+#### 🔍 Устранение неполадок
+1. Если PostgreSQL не подключается:
+   - Проверьте, что служба PostgreSQL запущена
+   - Убедитесь, что в `pg_hba.conf` есть строка:
+     ```
+     host    ticketdb        ticketuser      127.0.0.1/32            md5
+     ```
+
+2. Если клиент не видит сервер:
+   - Проверьте, что сервер запущен (`http://localhost:8080/actuator/health`)
+   - Убедитесь, что брандмауэр не блокирует порт 8080
+
+> **Примечание:** Для первого запуска может потребоваться несколько минут на загрузку зависимостей Maven.
